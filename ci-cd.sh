@@ -4,38 +4,45 @@
 
 set -e
 
+# Define the image name early
+IMAGE_NAME=btech:prod
+
 # 1. Use Minikube Docker daemon
 echo "Switching Docker to Minikube environment...."
 eval $(minikube docker-env)
 
-# 2. Build Docker image
-IMAGE_NAME=btech:production
+# 2. Delete the old Docker image (Cleanup Step)
+echo "Attempting to delete old Docker image: $IMAGE_NAME..."
+# The '|| true' ensures the script doesn't fail if the image doesn't exist.
+docker rmi $IMAGE_NAME 2>/dev/null || true 
+
+# 3. Build Docker image
 echo "Building Docker image $IMAGE_NAME..."
 docker build -t $IMAGE_NAME .
 
-# 3. Update deployment.yaml image
+# 4. Update deployment.yaml image
 echo "Updating deployment.yaml with image $IMAGE_NAME..."
 sed -i "s|image: .*|image: $IMAGE_NAME|" deployment.yaml
 
-# 4. Apply deployment and service
+# 5. Apply deployment and service
 echo "Applying Kubernetes deployment and service..."
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 
-# 5. Rollout restart
+# 6. Rollout restart
 echo "Restarting deployment..."
 kubectl rollout restart deployment node-deployment
 
-# 6. Show pod status
+# 7. Show pod status
 echo "Deployment status:"
 kubectl get pods -o wide
 
-# 7. Show service info
+# 8. Show service info
 echo "Service info:"
 kubectl get svc
 
-# 8. Get Service URL for access (NEW STEP)
-SERVICE_NAME=$(kubectl get svc -o jsonpath='{.items[?(@.spec.type=="NodePort")].metadata.name}') # Assumes a NodePort service is created
+# 9. Get Service URL for access
+SERVICE_NAME=$(kubectl get svc -o jsonpath='{.items[?(@.spec.type=="NodePort")].metadata.name}')
 if [ -n "$SERVICE_NAME" ]; then
     echo "Accessing service $SERVICE_NAME..."
     minikube service "$SERVICE_NAME" --url
