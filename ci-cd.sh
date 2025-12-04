@@ -5,7 +5,7 @@
 set -e
 
 # Define the image name early
-IMAGE_NAME=btech:prod
+IMAGE_NAME=btech:v1.0.0
 
 # 1. Use Minikube Docker daemon
 echo "Switching Docker to Minikube environment...."
@@ -26,6 +26,8 @@ sed -i "s|image: .*|image: $IMAGE_NAME|" deployment.yaml
 
 # 5. Apply deployment and service
 echo "Applying Kubernetes deployment and service..."
+kubectl delete -f deployment.yaml --ignore-not-found
+kubectl delete -f service.yaml --ignore-not-found
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 
