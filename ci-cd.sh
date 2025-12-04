@@ -5,7 +5,7 @@
 set -e
 
 # 1. Use Minikube Docker daemon
-echo "Switching Docker to Minikube environment...."
+ecpagesho "Switching Docker to Minikube environment...."
 eval $(minikube docker-env)
 
 # 2. Build Docker image
