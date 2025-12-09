@@ -51,4 +51,4 @@ else
     echo "Warning: Could not find a NodePort service to provide a URL."
 fi
 
-echo "CI/CD process completed successfully with version ${VERSION_TAG}."
+echo "CI/CD process completed successfully with version ${VERSION_TAG}.";
